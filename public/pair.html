@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#070913">
+  <title>BONY XMD | LINK DEVICE</title>
+  <meta name="description" content="Secure WhatsApp pairing powered by BONY XMD">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root { --bg:#070913; --panel:rgba(15,20,39,.78); --line:rgba(255,255,255,.13); --text:#f7fbff; --muted:#9ba7c2; --cyan:#40e7ff; --violet:#9d7bff; --green:#5ff0ae; --danger:#ff9a9a; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; display:grid; place-items:center; overflow-x:hidden; color:var(--text); background:var(--bg); font-family:'Space Grotesk',sans-serif; }
+    #particles-js { position:fixed; inset:0; z-index:-5; background:radial-gradient(circle at 10% 15%,rgba(64,231,255,.14),transparent 28%),radial-gradient(circle at 90% 90%,rgba(157,123,255,.16),transparent 30%),linear-gradient(140deg,#070913,#0d1125 55%,#160c1f); }
+    .ambient { position:fixed; inset:-20%; z-index:-4; pointer-events:none; filter:blur(80px); opacity:.42; background:conic-gradient(from 30deg,transparent,rgba(64,231,255,.22),transparent 30%,rgba(157,123,255,.22),transparent 70%); animation:spin 22s linear infinite; }
+    .page { width:min(100% - 28px, 760px); padding:28px 0 42px; animation:rise .8s ease both; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
+    .brand { display:flex; align-items:center; gap:12px; color:var(--text); text-decoration:none; font-weight:700; letter-spacing:.08em; }
+    .brand-icon { width:40px; height:40px; display:grid; place-items:center; color:var(--cyan); border:1px solid rgba(64,231,255,.45); border-radius:13px; background:rgba(64,231,255,.1); transform:rotate(-8deg); }
+    .brand-icon i { transform:rotate(8deg); }
+    .back-link { color:var(--muted); font:12px 'DM Mono',monospace; text-decoration:none; }
+    .back-link:hover { color:var(--cyan); }
+    .card { position:relative; padding:clamp(25px,6vw,58px); overflow:hidden; border:1px solid var(--line); border-radius:30px; background:var(--panel); box-shadow:0 28px 100px rgba(0,0,0,.46); backdrop-filter:blur(22px); }
+    .card::before { content:''; position:absolute; width:240px; height:240px; top:-150px; right:-100px; border-radius:50%; background:var(--cyan); filter:blur(75px); opacity:.14; }
+    .card::after { content:''; position:absolute; width:190px; height:190px; bottom:-120px; left:-90px; border-radius:50%; background:var(--violet); filter:blur(70px); opacity:.14; }
+    .header { position:relative; z-index:1; text-align:center; }
+    .logo-container { position:relative; width:128px; height:128px; margin:0 auto 23px; padding:7px; border:1px solid rgba(64,231,255,.4); border-radius:36px; background:linear-gradient(145deg,rgba(64,231,255,.18),rgba(157,123,255,.12)); box-shadow:0 0 38px rgba(64,231,255,.18); animation:float 5s ease-in-out infinite; }
+    .logo { width:100%; height:100%; overflow:hidden; border-radius:28px; border:1px solid rgba(255,255,255,.2); }
+    .logo img { display:block; width:100%; height:100%; object-fit:cover; }
+    .logo-back { display:none; }
+    .eyebrow { margin:0 0 12px; color:var(--cyan); font:500 11px 'DM Mono',monospace; letter-spacing:.15em; text-transform:uppercase; }
+    .title { margin:0; font-size:clamp(2.3rem,7vw,4.2rem); line-height:.95; letter-spacing:-.07em; background:linear-gradient(100deg,var(--cyan),#fff 50%,var(--violet)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .subtitle { max-width:450px; margin:16px auto 0; color:var(--muted); line-height:1.65; }
+    .tagline { display:inline-flex; align-items:center; gap:8px; margin-top:17px; padding:8px 12px; color:var(--green); border:1px solid rgba(95,240,174,.2); border-radius:999px; background:rgba(95,240,174,.06); font:11px 'DM Mono',monospace; text-transform:uppercase; letter-spacing:.09em; }
+    .tagline::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 12px var(--green); animation:pulse 1.6s ease-in-out infinite; }
+    .form { position:relative; z-index:1; margin-top:38px; }
+    .input-label { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; color:#dbe3f5; font-size:13px; font-weight:600; }
+    .input-label::after { content:'E.164 FORMAT'; color:var(--muted); font:10px 'DM Mono',monospace; letter-spacing:.08em; }
+    .input-field { width:100%; min-height:56px; padding:0 17px; color:var(--text); border:1px solid var(--line); border-radius:15px; outline:none; background:rgba(0,0,0,.2); font:16px 'DM Mono',monospace; transition:border-color .2s,box-shadow .2s,background .2s; }
+    .input-field:focus { border-color:var(--cyan); background:rgba(64,231,255,.05); box-shadow:0 0 0 4px rgba(64,231,255,.1); }
+    .generate-btn, .copy-btn { width:100%; min-height:54px; border-radius:15px; font:700 14px 'Space Grotesk',sans-serif; cursor:pointer; transition:transform .2s,box-shadow .2s,background .2s; }
+    .generate-btn { margin-top:14px; color:#061018; border:0; background:linear-gradient(110deg,var(--cyan),var(--green)); box-shadow:0 12px 34px rgba(64,231,255,.18); }
+    .generate-btn:hover { transform:translateY(-3px); box-shadow:0 16px 40px rgba(64,231,255,.3); }
+    .code-display { min-height:90px; display:flex; align-items:center; justify-content:center; margin:18px 0 12px; padding:18px; overflow-wrap:anywhere; color:var(--cyan); border:1px solid rgba(64,231,255,.23); border-radius:15px; background:rgba(64,231,255,.045); text-align:center; font:13px 'DM Mono',monospace; line-height:1.65; }
+    .copy-btn { color:var(--text); border:1px solid var(--line); background:rgba(255,255,255,.06); }
+    .copy-btn:hover { transform:translateY(-3px); border-color:rgba(157,123,255,.65); background:rgba(157,123,255,.12); box-shadow:0 12px 30px rgba(0,0,0,.25); }
+    .quick-links { position:relative; z-index:1; display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:26px; }
+    .quick-link { padding:14px 12px; color:var(--muted); border:1px solid rgba(255,255,255,.08); border-radius:14px; background:rgba(255,255,255,.035); text-align:center; text-decoration:none; font-size:12px; transition:transform .2s,border-color .2s,color .2s; }
+    .quick-link i { display:block; margin-bottom:8px; color:var(--cyan); }
+    .quick-link:hover { transform:translateY(-3px); color:var(--text); border-color:rgba(64,231,255,.35); }
+    .footer { margin-top:18px; color:var(--muted); text-align:center; font:10px 'DM Mono',monospace; letter-spacing:.08em; }
+    @keyframes rise { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes float { 0%,100% { transform:translateY(0) rotate(-2deg); } 50% { transform:translateY(-10px) rotate(2deg); } }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    @keyframes pulse { 0%,100% { opacity:.45; transform:scale(.8); } 50% { opacity:1; transform:scale(1.2); } }
+    @media (max-width:560px) { .topbar { margin-bottom:16px; } .card { border-radius:24px; padding:25px 18px; } .quick-links { grid-template-columns:1fr; } .input-label::after { display:none; } }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; } }
+  </style>
+</head>
+<body>
+    <audio id="pairMusic" loop preload="auto">
+      <source src="https://files.catbox.moe/a3ufpz.m4a" type="audio/mp4">
+    </audio>
+
+  <div id="particles-js"></div>
+  <div class="ambient"></div>
+  <div class="page">
+    <nav class="topbar">
+      <a class="brand" href="/" aria-label="BONY XMD home"><span class="brand-icon"><i class="fa-solid fa-bolt"></i></span><span>BONY XMD</span></a>
+      <a class="back-link" href="/">← Back to hub</a>
+    </nav>
+    <main class="card">
+      <div class="header">
+        <div class="logo-container" id="logoFlip"><div class="logo"><img src="https://files.catbox.moe/8rcgs3.jpg" alt="BONY XMD Logo"></div><div class="logo-back"><i class="fas fa-shield-alt"></i></div></div>
+        <p class="eyebrow">Secure device link</p>
+        <h1 class="title">Link your device</h1>
+        <p class="subtitle">Enter your WhatsApp number and generate a one-time pairing code for your BONY XMD session.</p>
+        <div class="tagline">Powered by BONY KE</div>
+      </div>
+      <div class="form">
+        <label class="input-label" for="mobileNumber">Phone number</label>
+        <input type="text" id="mobileNumber" class="input-field" placeholder="eg. +254748339103" autocomplete="tel">
+        <button class="generate-btn" id="submit" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i>&nbsp; GENERATE SESSION CODE</button>
+        <div class="code-display" id="codeDisplay">Your session ID will appear here</div>
+        <button class="copy-btn" id="copy" type="button"><i class="fas fa-copy"></i>&nbsp; COPY SESSION ID</button>
+      </div>
+      <div class="quick-links">
+        <a class="quick-link" href="https://chat.whatsapp.com/HxCDA2s89LMEZMyixnTSy5?s=cl&p=a&mlu=4" target="_blank" rel="noopener"><i class="fa-solid fa-users"></i>Support group</a>
+        <a class="quick-link" href="https://whatsapp.com/channel/0029Vb8coEnKAwEcRBDDnq0Z" target="_blank" rel="noopener"><i class="fa-solid fa-broadcast-tower"></i>BONY Channel</a>
+        <a class="quick-link" href="https://github.com/bonyke2-bot/BONY-XMD" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i>BONY XMD Repo</a>
+      </div>
+    </main>
+    <footer class="footer">BONY XMD / BONY XMD · SESSION LINK</footer>
+  </div>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js"></script>
+  <script>
+    particlesJS("particles-js", {
+      particles: {
+        number: { value: 80, density: { enable: true, area: 800 } },
+        color: { value: "#40e7ff" },
+        shape: { type: "circle" },
+        opacity: { value: 0.45, random: true },
+        size: { value: 3, random: true },
+        move: { enable: true, speed: 1.2 }
+      },
+      interactivity: {
+        events: {
+          onhover: { enable: true, mode: "repulse" },
+          onclick: { enable: true, mode: "push" }
+        }
+      },
+      retina_detect: true
+    });
+
+    const submitButton = document.getElementById("submit");
+    const numberInput = document.getElementById("mobileNumber");
+    const codeDisplay = document.getElementById("codeDisplay");
+    const copyButton = document.getElementById("copy");
+
+    submitButton.addEventListener("click", async () => {
+      const number = numberInput.value.replace(/\D/g, "");
+
+      if (!number) {
+        codeDisplay.textContent = "Enter a valid WhatsApp number";
+        return;
+      }
+
+      submitButton.disabled = true;
+      submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>&nbsp; GENERATING...';
+      codeDisplay.textContent = "Generating secure session…";
+
+      try {
+        const response = await fetch(
+          "/code/?number=" + encodeURIComponent(number)
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.code) {
+          throw new Error(
+            data.message || "Failed to generate pairing code."
+          );
+        }
+
+        codeDisplay.textContent = data.code;
+      } catch (error) {
+        codeDisplay.textContent = "ERROR";
+        console.error("Pairing error:", error);
+      } finally {
+        submitButton.disabled = false;
+        submitButton.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i>&nbsp; GENERATE SESSION CODE';
+      }
+    });
+
+    copyButton.addEventListener("click", async () => {
+      const code = codeDisplay.textContent.trim();
+
+      if (
+        !code ||
+        code === "Your session ID will appear here" ||
+        code === "ERROR" ||
+        code.startsWith("Generating")
+      ) {
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(code);
+        copyButton.innerHTML = '<i class="fas fa-check"></i>&nbsp; COPIED!';
+
+        setTimeout(() => {
+          copyButton.innerHTML = '<i class="fas fa-copy"></i>&nbsp; COPY SESSION ID';
+        }, 1500);
+      } catch (error) {
+        console.error("Copy error:", error);
+      }
+    });
+
+    const pairMusic = document.getElementById("pairMusic");
+
+    function startPairMusic() {
+      if (!pairMusic) return;
+      pairMusic.volume = 0.5;
+      pairMusic.play().catch(() => {});
+    }
+
+    window.addEventListener("load", startPairMusic);
+    document.addEventListener("pointerdown", startPairMusic, { once: true });
+
+  </script>
+</body>
+</html>
