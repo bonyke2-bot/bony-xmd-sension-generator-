@@ -28,7 +28,7 @@ function sessionId() {
   return SESSION_PREFIX + fs.readFileSync(credsPath).toString('base64');
 }
 
-async function start(phone) {
+async function start(phone, options = {}) {
   const {
     default: makeWASocket,
     useMultiFileAuthState,
@@ -94,6 +94,10 @@ async function start(phone) {
         sessionSent = true;
         console.log('[BONY-XMD] Session message sent successfully.');
 
+        if (typeof options.onSession === 'function') {
+          options.onSession(id);
+        }
+
         console.log('\n========================================');
         console.log('        BONY-XMD SESSION ID');
         console.log('========================================\n');
@@ -101,8 +105,10 @@ async function start(phone) {
         console.log('\n📩 Session ID sent to your WhatsApp DM.');
         console.log('========================================\n');
 
-        rl.close();
-        process.exit(0);
+        if (options.exitOnSuccess !== false) {
+          rl.close();
+          process.exit(0);
+        }
       } catch (sendError) {
         console.error('[BONY-XMD] Session send failed:', sendError.message);
       }
@@ -126,9 +132,16 @@ async function start(phone) {
         process.exit(1);
       }
 
+      if (code === DisconnectReason.connectionReplaced || code === 440) {
+        console.log('[BONY-XMD] Existing session was replaced. Clearing session.');
+        clearSessionFiles();
+        rl.close();
+        process.exit(1);
+      }
+
       console.log(`[BONY-XMD] Temporary disconnect (status ${code}). Reconnecting...`);
       await delay(10000);
-      start(phone);
+      start(phone, options);
     }
   });
 
@@ -146,13 +159,30 @@ async function start(phone) {
   console.log('        BONY-XMD PAIRING CODE');
   console.log('========================================\n');
   console.log(code);
+
+  if (typeof options.onPairingCode === 'function') {
+    options.onPairingCode(code);
+  }
   console.log('\nWhatsApp → Settings → Linked Devices');
   console.log('→ Link a Device → Link with phone number');
   console.log('========================================\n');
 }
 
-(async () => {
+async function runCli() {
   console.log('\n====== BONY-XMD SESSION GENERATOR ======\n');
+
+  if (fs.existsSync(credsPath)) {
+    try {
+      const creds = JSON.parse(fs.readFileSync(credsPath, 'utf8'));
+      if (creds.registered) {
+        console.log('[BONY-XMD] Existing registered session found. Restoring session...');
+        await start('', { exitOnSuccess: false });
+        return;
+      }
+    } catch (err) {
+      console.log('[BONY-XMD] Existing session could not be read. Starting pairing flow.');
+    }
+  }
 
   let phone = await ask('Enter WhatsApp number (e.g. 254700000000): ');
   phone = phone.replace(/\D/g, '');
@@ -166,10 +196,16 @@ async function start(phone) {
   }
 
   await start(phone);
-})().catch(err => {
-  console.error('[BONY-XMD]', err.message);
-  rl.close();
-  process.exit(1);
-});
+}
+
+module.exports = { start };
+
+if (require.main === module) {
+  runCli().catch(err => {
+    console.error('[BONY-XMD]', err.message);
+    rl.close();
+    process.exit(1);
+  });
+}
 
 
