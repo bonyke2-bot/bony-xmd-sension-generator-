@@ -1,0 +1,22 @@
+{
+  "name": "bony-xmd-session-generator",
+  "version": "1.0.0",
+  "description": "BONY-XMD WhatsApp Session Generator",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.17",
+    "awesome-phonenumber": "^5.9.0",
+    "axios": "^1.8.4",
+    "chalk": "^4.1.2",
+    "express": "^4.19.2",
+    "node-cache": "^5.1.2",
+    "pino": "^8.21.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
