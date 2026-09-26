@@ -25,7 +25,22 @@ function sessionId() {
   if (!fs.existsSync(credsPath)) {
     throw new Error('creds.json not found');
   }
-  return SESSION_PREFIX + fs.readFileSync(credsPath).toString('base64');
+
+  const files = {};
+  for (const file of fs.readdirSync(sessionDir)) {
+    const fullPath = path.join(sessionDir, file);
+    if (fs.statSync(fullPath).isFile()) {
+      files[file] = fs.readFileSync(fullPath).toString('base64');
+    }
+  }
+
+  const payload = JSON.stringify({
+    version: 2,
+    files
+  });
+
+  const compressed = require('zlib').gzipSync(Buffer.from(payload));
+  return 'BONY-XMD:~2' + compressed.toString('base64url');
 }
 
 async function start(phone, options = {}) {
