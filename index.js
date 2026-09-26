@@ -140,6 +140,7 @@ async function start(phone, options = {}) {
     }
 
     if (connection === 'close') {
+      socketClosed = true;
       if (intentionalClose) return;
       console.log('[BONY-XMD] DISCONNECT DEBUG:', JSON.stringify(lastDisconnect, null, 2));
       const code = lastDisconnect?.error?.output?.statusCode;
