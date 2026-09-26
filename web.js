@@ -57,7 +57,7 @@ app.get('/code/', async (req, res) => {
   });
 
   try {
-    await start(phone, {
+    start(phone, {
       exitOnSuccess: false,
                                 closeAfterSuccess: true,
 
