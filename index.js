@@ -45,7 +45,7 @@ async function start(phone, options = {}) {
 
   const sock = makeWASocket({
     version,
-    logger: pino({ level: 'silent' }),
+    logger: pino({ level: 'info' }),
     printQRInTerminal: false,
     browser: ['Ubuntu', 'Chrome', '20.0.04'],
     auth: {
