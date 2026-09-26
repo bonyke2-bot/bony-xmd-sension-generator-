@@ -59,6 +59,7 @@ app.get('/code/', async (req, res) => {
   try {
     await start(phone, {
       exitOnSuccess: false,
+                                closeAfterSuccess: true,
 
       onPairingCode(code) {
         const job = jobs.get(id);
@@ -148,6 +149,7 @@ app.post('/generate', async (req, res) => {
   try {
     await start(phone, {
       exitOnSuccess: false,
+                                closeAfterSuccess: true,
 
       onPairingCode(code) {
         const job = jobs.get(id);

@@ -81,6 +81,7 @@ async function start(phone, options = {}) {
 
   let pairingSucceeded = false;
   let sessionSent = false;
+  let intentionalClose = false;
 
   sock.ev.on('connection.update', async ({ connection, isNewLogin, lastDisconnect }) => {
     if (isNewLogin) {
@@ -121,12 +122,18 @@ async function start(phone, options = {}) {
         console.log('\n📩 Session ID sent to your WhatsApp DM.');
         console.log('========================================\n');
 
-        if (options.exitOnSuccess !== false) {
-          rl.close();
-          await delay(15000);
-        sock.end(undefined);
-      process.exit(0);
-        }
+            if (options.closeAfterSuccess) {
+              intentionalClose = true;
+              sock.end(undefined);
+              return;
+            }
+
+            if (options.exitOnSuccess !== false) {
+              rl.close();
+              await delay(15000);
+              sock.end(undefined);
+              process.exit(0);
+            }
       } catch (sendError) {
         console.error('[BONY-XMD] Session send failed:', sendError.message);
       }
@@ -134,6 +141,7 @@ async function start(phone, options = {}) {
 
     if (connection === 'close') {
       socketClosed = true;
+      if (intentionalClose) return;
       console.log('[BONY-XMD] DISCONNECT DEBUG:', JSON.stringify(lastDisconnect, null, 2));
       const code = lastDisconnect?.error?.output?.statusCode;
 
