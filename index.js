@@ -96,7 +96,8 @@ async function start(phone, options = {}) {
 
       if (socketClosed || sessionSent || !sock.user?.id) return;
 
-      const id = sessionId();
+      await delay(15000);
+    const id = sessionId();
       const recipient = sock.user.id;
 
       console.log('[BONY-XMD] Connected account:', recipient);
