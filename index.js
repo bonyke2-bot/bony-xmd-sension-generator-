@@ -122,7 +122,8 @@ async function start(phone, options = {}) {
 
         if (options.exitOnSuccess !== false) {
           rl.close();
-          process.exit(0);
+          await delay(15000);
+        process.exit(0);
         }
       } catch (sendError) {
         console.error('[BONY-XMD] Session send failed:', sendError.message);
