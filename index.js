@@ -101,19 +101,46 @@ async function start(phone, options = {}) {
 
       if (socketClosed || sessionSent || !sock.user?.id) return;
 
-      await delay(15000);
-    const id = sessionId(activeSessionDir);
       const recipient = sock.authState?.creds?.me?.lid || `${sock.user.id.split(":")[0]}@s.whatsapp.net`;
 
-      console.log('[BONY-XMD] Connected account:', recipient);
-      console.log('[BONY-XMD] Self PN:', sock.user?.id, 'Self LID:', sock.user?.lid);
+    console.log('[BONY-XMD] Connected account:', recipient);
+    console.log('[BONY-XMD] Self PN:', sock.user?.id, 'Self LID:', sock.user?.lid);
 
-      try {
+    try {
+      const scannerFrames = [
+        '🔐 *BONY-XMD SESSION GENERATOR*\n\n⏳ generating Session ID......\n\n[░░░░░░░░░░] 0%\n\nPlease wait while your new session is being prepared.\n\n⚡ BONY-XMD • Starting...\n👑 Powered by BONY KE',
+        '🔐 *BONY-XMD SESSION GENERATOR*\n\n⏳ generating Session ID......\n\n[██░░░░░░░░] 20%\n\nPlease wait while your new session is being prepared.\n\n⚡ BONY-XMD • Preparing...\n👑 Powered by BONY KE',
+        '🔐 *BONY-XMD SESSION GENERATOR*\n\n⏳ generating Session ID......\n\n[█████░░░░░] 50%\n\nPlease wait while your new session is being prepared.\n\n⚡ BONY-XMD • Almost ready...\n👑 Powered by BONY KE',
+        '🔐 *BONY-XMD SESSION GENERATOR*\n\n⏳ generating Session ID......\n\n[███████░░░] 70%\n\nPlease wait while your new session is being prepared.\n\n⚡ BONY-XMD • Finalizing...\n👑 Powered by BONY KE',
+        '🔐 *BONY-XMD SESSION GENERATOR*\n\n⏳ generating Session ID......\n\n[██████████] 100%\n\nPlease wait while your new session is being prepared.\n\n⚡ BONY-XMD • Ready...\n👑 Powered by BONY KE'
+      ];
+
+      const scannerMessage = await sock.sendMessage(recipient, {
+        text: scannerFrames[0]
+      });
+      const scannerKey = scannerMessage.key;
+
+      const scannerStart = Date.now();
+      const scannerDuration = 10000;
+
+      for (let i = 1; i < scannerFrames.length; i++) {
+        const target = scannerStart + Math.round((scannerDuration / (scannerFrames.length - 1)) * i);
+        const wait = Math.max(0, target - Date.now());
+        if (wait) await delay(wait);
+
         await sock.sendMessage(recipient, {
-          text: `🔐 *BONY-XMD SESSION ID*\n\n${id}\n\n⚠️ Keep this session ID private.`
+          text: scannerFrames[i],
+          edit: scannerKey
         });
+      }
 
-        sessionSent = true;
+      const id = sessionId(activeSessionDir);
+
+      await sock.sendMessage(recipient, {
+        text: id
+      });
+
+      sessionSent = true;
         console.log('[BONY-XMD] Session message sent successfully.');
 
         if (typeof options.onSession === 'function') {
