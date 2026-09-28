@@ -38,7 +38,8 @@ app.get('/api/stats', (req, res) => {
 });
 
 app.get('/code/', async (req, res) => {
-  const phone = String(req.query.number || '').replace(/\D/g, '');
+  let phone = String(req.query.number || '').replace(/\D/g, '');
+  if (/^0[17]\d{8}$/.test(phone)) phone = '254' + phone.slice(1);
 
   if (!pn('+' + phone).isValid()) {
     return res.status(400).json({
