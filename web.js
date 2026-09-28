@@ -41,7 +41,7 @@ app.get('/code/', async (req, res) => {
   let phone = String(req.query.number || '').replace(/\D/g, '');
   if (/^0[17]\d{8}$/.test(phone)) phone = '254' + phone.slice(1);
 
-  if (!pn('+' + phone).isValid()) {
+  if (!pn('+' + phone).isValid() && !/^2541\d{8}$/.test(phone)) {
     return res.status(400).json({
       message: 'Invalid WhatsApp number.'
     });
