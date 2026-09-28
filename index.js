@@ -16,19 +16,20 @@ const rl = readline.createInterface({
 
 const ask = q => new Promise(resolve => rl.question(q, resolve));
 
-function clearSessionFiles() {
-  fs.rmSync(sessionDir, { recursive: true, force: true });
+function clearSessionFiles(targetDir = sessionDir) {
+  fs.rmSync(targetDir, { recursive: true, force: true });
   console.log('[BONY-XMD] Invalid session cleared.');
 }
 
-function sessionId() {
-  if (!fs.existsSync(credsPath)) {
+function sessionId(targetDir = sessionDir) {
+  const targetCredsPath = path.join(targetDir, 'creds.json');
+  if (!fs.existsSync(targetCredsPath)) {
     throw new Error('creds.json not found');
   }
 
   const files = {};
-  for (const file of fs.readdirSync(sessionDir)) {
-    const fullPath = path.join(sessionDir, file);
+  for (const file of fs.readdirSync(targetDir)) {
+    const fullPath = path.join(targetDir, file);
     if (fs.statSync(fullPath).isFile()) {
       files[file] = fs.readFileSync(fullPath).toString('base64');
     }
@@ -44,6 +45,8 @@ function sessionId() {
 }
 
 async function start(phone, options = {}) {
+  const activeSessionDir = options.sessionDir || sessionDir;
+
   const {
     default: makeWASocket,
     useMultiFileAuthState,
@@ -52,10 +55,10 @@ async function start(phone, options = {}) {
     makeCacheableSignalKeyStore,
     delay
   } = require('@whiskeysockets/baileys');
-  await fs.promises.mkdir(sessionDir, { recursive: true });
+  await fs.promises.mkdir(activeSessionDir, { recursive: true });
 
   const { version } = await fetchLatestBaileysVersion();
-  const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
+  const { state, saveCreds } = await useMultiFileAuthState(activeSessionDir);
   const msgRetryCounterCache = new NodeCache();
 
   const sock = makeWASocket({
@@ -77,6 +80,7 @@ async function start(phone, options = {}) {
   });
 
   sock.ev.on('creds.update', saveCreds);
+  sock.ev.on('messages.update', updates => console.log('[BONY-XMD] MESSAGE UPDATE:', JSON.stringify(updates)));
   let socketClosed = false;
 
   let pairingSucceeded = false;
@@ -98,10 +102,11 @@ async function start(phone, options = {}) {
       if (socketClosed || sessionSent || !sock.user?.id) return;
 
       await delay(15000);
-    const id = sessionId();
-      const recipient = sock.user.id;
+    const id = sessionId(activeSessionDir);
+      const recipient = sock.authState?.creds?.me?.lid || `${sock.user.id.split(":")[0]}@s.whatsapp.net`;
 
       console.log('[BONY-XMD] Connected account:', recipient);
+      console.log('[BONY-XMD] Self PN:', sock.user?.id, 'Self LID:', sock.user?.lid);
 
       try {
         await sock.sendMessage(recipient, {
@@ -153,14 +158,14 @@ async function start(phone, options = {}) {
 
       if (code === DisconnectReason.loggedOut || code === 401) {
         console.log('[BONY-XMD] WhatsApp logged out.');
-        clearSessionFiles();
+        clearSessionFiles(activeSessionDir);
         rl.close();
         process.exit(1);
       }
 
       if (code === DisconnectReason.connectionReplaced || code === 440) {
         console.log('[BONY-XMD] Existing session was replaced. Clearing session.');
-        clearSessionFiles();
+        clearSessionFiles(activeSessionDir);
         rl.close();
         process.exit(1);
       }

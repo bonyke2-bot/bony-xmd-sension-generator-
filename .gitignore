@@ -3,3 +3,5 @@ session/
 *.log
 
 index.js.before-*
+
+pair-sessions/
