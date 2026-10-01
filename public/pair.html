@@ -176,7 +176,7 @@
           copyButton.innerHTML = '<i class="fas fa-copy"></i>&nbsp; COPY SESSION ID';
         }, 1500);
       } catch (error) {
-        console.error("Copy error:", error);
+        console.error("Copy error:", error); alert("Copy failed. Please allow clipboard access and try again.");
       }
     });
 
