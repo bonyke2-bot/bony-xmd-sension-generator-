@@ -29,6 +29,7 @@ function sessionId(targetDir = sessionDir) {
 
   const files = {};
   for (const file of fs.readdirSync(targetDir)) {
+    if (file === 'app-state-sync-version-regular_low.json') continue;
     const fullPath = path.join(targetDir, file);
     if (fs.statSync(fullPath).isFile()) {
       files[file] = fs.readFileSync(fullPath).toString('base64');
