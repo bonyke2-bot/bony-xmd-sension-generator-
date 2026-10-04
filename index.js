@@ -155,7 +155,7 @@ async function start(phone, options = {}) {
         console.log('========================================\n');
 
             if (options.closeAfterSuccess) {
-              intentionalClose = true;
+              await delay(5000); intentionalClose = true;
               sock.end(undefined);
               return;
             }

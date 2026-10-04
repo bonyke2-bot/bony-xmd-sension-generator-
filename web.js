@@ -60,7 +60,7 @@ app.get('/code/', async (req, res) => {
   try {
     start(phone, { sessionDir: path.join(__dirname, "pair-sessions", id),
       exitOnSuccess: false,
-                                closeAfterSuccess: false,
+                                closeAfterSuccess: true,
 
       onPairingCode(code) {
         const job = jobs.get(id);
@@ -150,7 +150,7 @@ app.post('/generate', async (req, res) => {
   try {
     await start(phone, { sessionDir: path.join(__dirname, "pair-sessions", id),
       exitOnSuccess: false,
-                                closeAfterSuccess: false,
+                                closeAfterSuccess: true,
 
       onPairingCode(code) {
         const job = jobs.get(id);
